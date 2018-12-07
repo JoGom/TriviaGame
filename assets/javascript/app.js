@@ -55,19 +55,30 @@ $(document).ready(function(){
     var correct = 0;
     var incorrect = 0;
     var unanswered = 0;
+    var qIndex = 0;
 
     $("#reset").hide();
 
-    sortArray();
-    function sortArray(){
-        questionObj = questionObj[Math.floor(Math.random()*questionObj.length)];
-    console.log(questionObj);
-    }
+    $("#start").on("click", function () {
+		$("#start").hide();
+		showQuestion();
+    });
     
     function showQuestion(){
-
+        $("#question").text(questionObj[qIndex].question);
+        for(var i = 0; i < questionObj[qIndex].choice.length; i++){
+            var userChoice = $("<div>");
+			userChoice.addClass("choice");
+			userChoice.html(questionObj[qIndex].choice[i]);
+			userChoice.attr("data-guessvalue", i);
+			$("#choiceBlock").append(userChoice);
+        }
+        qIndex++;
     }
 
+    $(".choice").on("click", function () {
+
+    });
 
 
 
