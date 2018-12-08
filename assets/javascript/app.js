@@ -52,6 +52,8 @@ $(document).ready(function(){
         }
     ];
     var running = false;
+    var intervalId;
+    var time = 20;
     var correct = 0;
     var incorrect = 0;
     var unanswered = 0;
@@ -62,10 +64,20 @@ $(document).ready(function(){
 
     $("#start").on("click", function () {
 		$("#start").hide();
-		showQuestion();
+        showQuestion();
     });
+
+    $("#reset").on("click", function () {
+        $("#reset").hide();
+        $("#choiceBlock").empty();
+        $("#question").empty();
+        qIndex = 0;
     
+        showQuestion();
+    });
+
     function showQuestion(){
+        timer();
         $("#question").text(questionObj[qIndex].question);
         for(var i = 0; i < questionObj[qIndex].choice.length; i++){
             var userChoice = $("<div>");
@@ -74,11 +86,11 @@ $(document).ready(function(){
 			userChoice.attr("data-value", i);
 			$("#choiceBlock").append(userChoice);
         }
-    
         $(".choices").on("click", function () {
             pick = parseInt($(this).attr("data-value"));
-
+        
             if (pick === questionObj[qIndex].anwser){
+                stop();
                 correct++;
                 console.log(correct);
                 pick = "";
@@ -86,7 +98,8 @@ $(document).ready(function(){
                 qIndex++;
                 changeQuestion();
             }
-            else {
+            else if(pick !== questionObj[qIndex].anwser){
+                stop();
                 incorrect++;
                 pick = "";
                 $("#choiceBlock").html("<p>Nope! The correct anwser is: " +questionObj[qIndex].choice[questionObj[qIndex].anwser]+"</p>");
@@ -97,8 +110,11 @@ $(document).ready(function(){
     }
 
     function changeQuestion(){
-        if((correct + incorrect + unanswered) === questionObj.length){
+
+        var delay = setTimeout(function(){
+            time = 20;
             $("#choiceBlock").empty();
+        if((correct + incorrect + unanswered) === questionObj.length){
             $("#question").empty();
             $("#choiceBlock").append("<h3> Correct: " + correct + "</h3>" );
 		    $("#choiceBlock").append("<h3> Incorrect: " + incorrect + "</h3>" );
@@ -111,15 +127,31 @@ $(document).ready(function(){
         else{
             showQuestion();
         }
+        }, 2000);
     }
 
-    $("#reset").on("click", function () {
-        $("#reset").hide();
-        $("#choiceBlock").empty();
-        $("#question").empty();
-        qIndex = 0;
-		showQuestion();
-    });
+    function timer(){
+        if(running === false){
+            intervalId = setInterval(decrement, 1000);
+            running = true;
+        }
+        
 
+    }
+    function decrement(){
+        $("#timeBlock").text("Time Left: "+time);
+        time--;
+        if(time === 0 ){
+            unanswered++;
+            stop();
+            $("#choiceBlock").html("<p>Timesup! The correct anwser is: " +questionObj[qIndex].choice[questionObj[qIndex].anwser]+"</p>");
+            qIndex++;
+            changeQuestion();
+        }
+    }
+    function stop(){
+        clearInterval(intervalId);
+        running = false;
+    }
 
 });
