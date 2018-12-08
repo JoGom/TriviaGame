@@ -56,6 +56,7 @@ $(document).ready(function(){
     var incorrect = 0;
     var unanswered = 0;
     var qIndex = 0;
+    var pick = "";
 
     $("#reset").hide();
 
@@ -68,18 +69,57 @@ $(document).ready(function(){
         $("#question").text(questionObj[qIndex].question);
         for(var i = 0; i < questionObj[qIndex].choice.length; i++){
             var userChoice = $("<div>");
-			userChoice.addClass("choice");
+			userChoice.addClass("choices");
 			userChoice.html(questionObj[qIndex].choice[i]);
-			userChoice.attr("data-guessvalue", i);
+			userChoice.attr("data-value", i);
 			$("#choiceBlock").append(userChoice);
         }
-        qIndex++;
+    
+        $(".choices").on("click", function () {
+            pick = parseInt($(this).attr("data-value"));
+
+            if (pick === questionObj[qIndex].anwser){
+                correct++;
+                console.log(correct);
+                pick = "";
+                $("#choiceBlock").html("<p>You are Correct!</p>");
+                qIndex++;
+                changeQuestion();
+            }
+            else {
+                incorrect++;
+                pick = "";
+                $("#choiceBlock").html("<p>Nope! The correct anwser is: " +questionObj[qIndex].choice[questionObj[qIndex].anwser]+"</p>");
+                qIndex++;
+                changeQuestion();
+            }
+         });
     }
 
-    $(".choice").on("click", function () {
+    function changeQuestion(){
+        if((correct + incorrect + unanswered) === questionObj.length){
+            $("#choiceBlock").empty();
+            $("#question").empty();
+            $("#choiceBlock").append("<h3> Correct: " + correct + "</h3>" );
+		    $("#choiceBlock").append("<h3> Incorrect: " + incorrect + "</h3>" );
+            $("#choiceBlock").append("<h3> Unanswered: " + unanswered + "</h3>" );
+            $("#reset").show();
+            correct = 0;
+            incorrect = 0;
+            unanswered = 0;
+        }
+        else{
+            showQuestion();
+        }
+    }
 
+    $("#reset").on("click", function () {
+        $("#reset").hide();
+        $("#choiceBlock").empty();
+        $("#question").empty();
+        qIndex = 0;
+		showQuestion();
     });
 
 
-
-})
+});
